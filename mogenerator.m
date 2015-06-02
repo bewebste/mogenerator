@@ -566,6 +566,15 @@ static NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName
     }
 }
 
+- (NSString*)ownershipQualifier {
+	NSString* customQualifier = [[self userInfo] objectForKey:@"mogenerator.ownershipQualifier"];
+	
+	if (customQualifier)
+		return customQualifier;
+	else
+		return @"strong";
+}
+
 @end
 
 @implementation NSString (camelCaseString)
