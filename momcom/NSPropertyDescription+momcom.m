@@ -19,6 +19,10 @@
     }
 
     NSPropertyDescription *propertyDescription = [[self alloc] init];
+	//If a property is marked as non-optional in the MOM, the XML will have no "optional"
+	//attribute at all. NSPropertyDescription's default value is YES, but we want our default
+	//value to be NO.
+	propertyDescription.optional = NO;
     BOOL syncable = NO;
 
     for (NSXMLNode *xmlAttribute in [xmlNode attributes]) {
