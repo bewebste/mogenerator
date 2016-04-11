@@ -524,6 +524,42 @@ static NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName
             return nil;
     }
 }
+- (NSString*)swiftScalarFactoryMethodName {
+    
+    BOOL isUnsigned = [self isUnsigned];
+    
+    switch ([self attributeType]) {
+        case NSInteger16AttributeType:
+            if (isUnsigned) {
+                return @"unsignedShort";
+            }
+            return @"short";
+            break;
+        case NSInteger32AttributeType:
+            if (isUnsigned) {
+                return @"unsignedInt";
+            }
+            return @"int";
+            break;
+        case NSInteger64AttributeType:
+            if (isUnsigned) {
+                return @"unsignedLongLong";
+            }
+            return @"longLong";
+            break;
+        case NSDoubleAttributeType:
+            return @"double";
+            break;
+        case NSFloatAttributeType:
+            return @"float";
+            break;
+        case NSBooleanAttributeType:
+            return @"bool";
+            break;
+        default:
+            return nil;
+    }
+}
 - (BOOL)hasDefinedAttributeType {
     return [self attributeType] != NSUndefinedAttributeType;
 }
@@ -578,6 +614,27 @@ static NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName
         return YES;
     }
     return NO;
+}
+
+- (BOOL)hasDefaultValue {
+    return self.defaultValue != nil;
+}
+
+- (NSString*)swiftDefaultValueLiteral {
+    switch ([self attributeType]) {
+        case NSBooleanAttributeType:
+            return [self.defaultValue boolValue] ? @"true" : @"false";
+        case NSInteger16AttributeType:
+        case NSInteger32AttributeType:
+        case NSInteger64AttributeType:
+        case NSFloatAttributeType:
+        case NSDoubleAttributeType:
+            return [(NSNumber*)self.defaultValue stringValue] ?: @"0";
+        case NSStringAttributeType:
+            return [NSString stringWithFormat:@"\"%@\"", self.defaultValue];
+        default:
+            return nil;
+    }
 }
 
 @end
