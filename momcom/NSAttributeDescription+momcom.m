@@ -92,7 +92,11 @@ static NSDictionary *attributeTypeForString;
 
                 break;
             }
-                
+			case NSStringAttributeType:
+			{
+				[attributeDescription setDefaultValue:defaultValueString];
+				break;
+			}
             default:
                 break;
         }
