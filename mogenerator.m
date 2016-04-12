@@ -1,5 +1,5 @@
 // mogenerator.m
-//   Copyright (c) 2006-2015 Jonathan 'Wolf' Rentzsch: http://rentzsch.com
+//   Copyright (c) 2006-2016 Jonathan 'Wolf' Rentzsch: http://rentzsch.com
 //   Some rights reserved: http://opensource.org/licenses/mit
 //   http://github.com/rentzsch/mogenerator
 
@@ -8,13 +8,13 @@
 #import "NSString+MORegEx.h"
 
 static NSString * const kTemplateVar = @"TemplateVar";
-NSString  *gCustomBaseClass;
-NSString  *gCustomBaseClassImport;
-NSString  *gCustomBaseClassForced;
-BOOL       gSwift;
+static NSString  *gCustomBaseClass;
+static NSString  *gCustomBaseClassImport;
+static NSString  *gCustomBaseClassForced;
+static BOOL       gSwift;
 
-static NSString *const kAttributeValueScalarTypeKey = @"attributeValueScalarType";
-static NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName";
+static const NSString *const kAttributeValueScalarTypeKey = @"attributeValueScalarType";
+static const NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName";
 
 @interface NSEntityDescription (fetchedPropertiesAdditions)
 - (NSDictionary*)fetchedPropertiesByName;
@@ -283,7 +283,7 @@ static NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName
     NSDictionary *fetchRequests = [[self managedObjectModel] valueForKey:@"fetchRequestTemplatesByName"];
 
     NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:[fetchRequests count]];
-    
+
     NSArray *keys = [fetchRequests allKeys];
     for (NSString *fetchRequestName in keys)
     {
@@ -375,7 +375,7 @@ static NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName
 - (NSArray*)prettyFetchRequests {
     NSDictionary *fetchRequests = [self fetchRequestTemplates];
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:[fetchRequests count]];
-    
+
     NSArray *keys = [fetchRequests allKeys];
     for (NSString *fetchRequestName in keys)
     {
@@ -641,12 +641,28 @@ static NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFileName
 
 @implementation NSRelationshipDescription (collectionClassName)
 
+- (NSString*)jr_CollectionClassStringWithOrderedClassName:(NSString*)orderedClassName
+                                       unorderedClassName:(NSString*)unorderedClassName
+{
+    NSString *generic = [NSString stringWithFormat:@"<%@*>", self.destinationEntity.managedObjectClassName];
+    if (gSwift) {
+        // No generics for Swift sets, for now.
+        return [self jr_isOrdered] ? orderedClassName : unorderedClassName;
+    }
+
+    return [self jr_isOrdered]
+        ? [orderedClassName stringByAppendingString:generic]
+        : [unorderedClassName stringByAppendingString:generic];
+}
+
 - (NSString*)mutableCollectionClassName {
-    return [self jr_isOrdered] ? @"NSMutableOrderedSet" : @"NSMutableSet";
+    return [self jr_CollectionClassStringWithOrderedClassName:@"NSMutableOrderedSet"
+                                           unorderedClassName:@"NSMutableSet"];
 }
 
 - (NSString*)immutableCollectionClassName {
-    return [self jr_isOrdered] ? @"NSOrderedSet" : @"NSSet";
+    return [self jr_CollectionClassStringWithOrderedClassName:@"NSOrderedSet"
+                                           unorderedClassName:@"NSSet"];
 }
 
 - (BOOL)jr_isOrdered {
@@ -701,7 +717,7 @@ static MiscMergeEngine* engineWithTemplateDesc(MogeneratorTemplateDesc *template
     } else {
         NSData *templateData = [[NSBundle mainBundle] objectForInfoDictionaryKey:[templateDesc_ templateName]];
         assert(templateData);
-        NSString *templateString = [[[NSString alloc] initWithData:templateData encoding:NSASCIIStringEncoding] autorelease];
+        NSString *templateString = [[[NSString alloc] initWithData:templateData encoding:NSUTF8StringEncoding] autorelease];
         [template setFilename:[@"x-__info_plist://" stringByAppendingString:[templateDesc_ templateName]]];
         [template parseString:templateString];
     }
@@ -767,6 +783,7 @@ NSString *ApplicationSupportSubdirectoryName = @"mogenerator";
     DDGetoptOption optionTable[] =
     {
         // Long                 Short  Argument options
+        {@"v2",                 '2',   DDGetoptNoArgument},
         {@"model",              'm',   DDGetoptRequiredArgument},
         {@"configuration",      'C',   DDGetoptRequiredArgument},
         {@"base-class",         0,     DDGetoptRequiredArgument},
@@ -918,7 +935,7 @@ NSString *ApplicationSupportSubdirectoryName = @"mogenerator";
             // Cool, the model is in the Xcode 4.0+ format, we can compile it ourselves.
             NSError *compileError = nil;
             momFilePath = [NSManagedObjectModel compileModelAtPath:momOrXCDataModelFilePath inDirectory:NSTemporaryDirectory() error:&compileError];
-            if (compileError) {
+            if (momFilePath == nil) {
                 NSLog(@"Error: %@", [compileError localizedDescription]);
             }
             assert(momFilePath);
@@ -1029,10 +1046,10 @@ NSString *ApplicationSupportSubdirectoryName = @"mogenerator";
     }
 
     if (_version) {
-        printf("mogenerator 1.29. By Jonathan 'Wolf' Rentzsch + friends.\n");
+        printf("mogenerator 1.30.1. By Jonathan 'Wolf' Rentzsch + friends.\n");
         return EXIT_SUCCESS;
     }
-    
+
     gSwift = _swift;
 
     if (baseClassForce) {
@@ -1072,12 +1089,12 @@ NSString *ApplicationSupportSubdirectoryName = @"mogenerator";
             if (![srcDir length]) {
                 srcDir = [fm currentDirectoryPath];
             }
-            
+
             NSArray *subpaths = [fm subpathsAtPath:srcDir];
             for (NSString *srcFileName in subpaths)
             {
                 NSString *moSourceFileRegex = @"_?([a-zA-Z0-9_]+MO).(h|m|mm)"; // Sadly /^(*MO).(h|m|mm)$/ doesn't work.
-                
+
                 if ([srcFileName isMatchedByRegex:moSourceFileRegex]) {
                     NSString *entityName = [[srcFileName captureComponentsMatchedByRegex:moSourceFileRegex] objectAtIndex:1];
                     if (![entityFilesByName objectForKey:entityName]) {
@@ -1085,17 +1102,17 @@ NSString *ApplicationSupportSubdirectoryName = @"mogenerator";
                     }
                     [[entityFilesByName objectForKey:entityName] addObject:srcFileName];
                 }
-    
+
             }
         }
-        
+
         NSArray *entitiesWithCustomSubclass = [model entitiesWithACustomSubclassInConfiguration:configuration verbose:NO];
-        
+
         for (NSEntityDescription *entity in entitiesWithCustomSubclass)
         {
             [entityFilesByName removeObjectForKey:[entity managedObjectClassName]];
         }
-        
+
         for (NSSet *orphanedFiles in entityFilesByName)
         {
             for (NSString *orphanedFile in orphanedFiles)
@@ -1176,7 +1193,7 @@ NSString *ApplicationSupportSubdirectoryName = @"mogenerator";
             // remove unnecessary empty lines
             NSString *searchPattern = @"([ \t]*(\n|\r|\r\n)){2,}";
             NSString *replacementString = @"\n\n";
-            
+
             generatedMachineH = [generatedMachineH stringByReplacingOccurrencesOfRegex:searchPattern withString:replacementString];
             generatedMachineM = [generatedMachineM stringByReplacingOccurrencesOfRegex:searchPattern withString:replacementString];
             generatedHumanH = [generatedHumanH stringByReplacingOccurrencesOfRegex:searchPattern withString:replacementString];
@@ -1263,7 +1280,7 @@ NSString *ApplicationSupportSubdirectoryName = @"mogenerator";
 
         if (_listSourceFiles) {
             NSArray *filesList = [NSArray arrayWithObjects:humanMFiles, humanHFiles, machineMFiles, machineHFiles, nil];
-            
+
             for (NSArray *files in filesList)
             {
                 for (NSString *fileName in files)

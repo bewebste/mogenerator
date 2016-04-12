@@ -1,5 +1,5 @@
 // mogenerator.h
-//   Copyright (c) 2006-2015 Jonathan 'Wolf' Rentzsch: http://rentzsch.com
+//   Copyright (c) 2006-2016 Jonathan 'Wolf' Rentzsch: http://rentzsch.com
 //   Some rights reserved: http://opensource.org/licenses/mit
 //   http://github.com/rentzsch/mogenerator
 
@@ -76,6 +76,7 @@
     BOOL                  _listSourceFiles;
     BOOL                  _orphaned;
     BOOL                  _swift;
+    BOOL                  _v2;
     NSMutableDictionary   *templateVar;
 }
 @end

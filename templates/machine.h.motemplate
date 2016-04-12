@@ -1,7 +1,14 @@
 // DO NOT EDIT. This file is machine-generated and constantly overwritten.
 // Make changes to <$managedObjectClassName$>.h instead.
 
-@import CoreData;
+#if __has_feature(modules)
+    @import Foundation;
+    @import CoreData;
+#else
+    #import <Foundation/Foundation.h>
+    #import <CoreData/CoreData.h>
+#endif
+
 
 <$if hasCustomSuperentity$><$if hasSuperentity$>#import "<$customSuperentity$>.h"
 <$else$><$if hasCustomBaseCaseImport$>#import <$baseClassImport$><$else$>#import "<$customSuperentity$>.h"<$endif$><$endif$><$endif$>
@@ -11,29 +18,6 @@
 <$endif$>
 
 NS_ASSUME_NONNULL_BEGIN
-<$if noninheritedAttributes.@count > 0$>
-@interface <$managedObjectClassName$>Attributes: NSObject <$foreach Attribute noninheritedAttributes do$>
-+ (NSString *)<$Attribute.name$>;<$endforeach do$>
-@end
-<$endif$>
-
-<$if noninheritedRelationships.@count > 0$>
-@interface <$managedObjectClassName$>Relationships: NSObject<$foreach Relationship noninheritedRelationships do$>
-+ (NSString *)<$Relationship.name$>;<$endforeach do$>
-@end
-<$endif$>
-
-<$if noninheritedFetchedProperties.@count > 0$>
-@interface <$managedObjectClassName$>FetchedProperties: NSObject<$foreach FetchedProperty noninheritedFetchedProperties do$>
-+ (NSString *)<$FetchedProperty.name$>;<$endforeach do$>
-@end
-<$endif$>
-
-<$if hasUserInfoKeys$>
-@interface <$managedObjectClassName$>UserInfo: NSObject <$foreach UserInfo userInfoKeyValues do$>
-+ (NSString *)<$UserInfo.key$>;<$endforeach do$>
-@end
-<$endif$>
 
 <$foreach Relationship noninheritedRelationships do$>@class <$Relationship.destinationEntity.managedObjectClassName$>;
 <$endforeach do$>
@@ -59,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)insertInManagedObjectContext:(NSManagedObjectContext *)moc_;
 + (NSString*)entityName;
 + (NSEntityDescription*)entityInManagedObjectContext:(NSManagedObjectContext*)moc_;
-@property (nonatomic, readonly, strong) <$managedObjectClassName$>ID*objectID;
+@property (nonatomic, readonly, strong) <$managedObjectClassName$>ID *objectID;
 
 <$foreach Attribute noninheritedAttributes do$>
 <$if Attribute.userInfo.documentation$>
@@ -70,6 +54,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 <$endif$>
 <$if Attribute.hasDefinedAttributeType$>
+<$if (Attribute.hasScalarAttributeType &&  !Attribute.optional && TemplateVar.scalarsWhenNonOptional)$>
+<$if Attribute.isReadonly$>
+@property (atomic, readonly) <$Attribute.scalarAttributeType$> <$Attribute.name$>;
+<$else$>
+@property (atomic) <$Attribute.scalarAttributeType$> <$Attribute.name$>;
+<$endif$>
+<$else$>
 <$if Attribute.isReadonly$>
 @property (nonatomic, strong, readonly<$if Attribute.optional$>, nullable<$endif$>) <$Attribute.objectAttributeType$> <$Attribute.name$>;
 <$else$>
@@ -85,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)set<$Attribute.name.initialCapitalString$>Value:(<$Attribute.scalarAttributeType$>)value_;
 <$endif$>
 <$endif$>
-//- (BOOL)validate<$Attribute.name.initialCapitalString$>:(id*)value_ error:(NSError**)error_;
+<$endif$>
 <$endif$>
 <$endforeach do$>
 <$foreach Relationship noninheritedRelationships do$>
@@ -120,7 +111,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) <$Relationship.destinationEntity.managedObjectClassName$> *<$Relationship.name$>;
 <$else$>
 @property (nonatomic, strong<$if Relationship.optional$>, nullable<$endif$>) <$Relationship.destinationEntity.managedObjectClassName$> *<$Relationship.name$>;
-//- (BOOL)validate<$Relationship.name.initialCapitalString$>:(id*)value_ error:(NSError**)error_;
 <$endif$>
 <$endforeach do$>
 <$foreach FetchRequest prettyFetchRequests do$>
@@ -152,7 +142,6 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 <$endif$>
 @end
-
 
 <$foreach Relationship noninheritedRelationships do$>
 <$if Relationship.isToMany$>
@@ -204,4 +193,30 @@ NS_ASSUME_NONNULL_BEGIN
 <$endif$>
 <$endforeach do$>
 @end
+
+
+<$if noninheritedAttributes.@count > 0$>
+@interface <$managedObjectClassName$>Attributes: NSObject <$foreach Attribute noninheritedAttributes do$>
++ (NSString *)<$Attribute.name$>;<$endforeach do$>
+@end
+<$endif$>
+
+<$if noninheritedRelationships.@count > 0$>
+@interface <$managedObjectClassName$>Relationships: NSObject<$foreach Relationship noninheritedRelationships do$>
++ (NSString *)<$Relationship.name$>;<$endforeach do$>
+@end
+<$endif$>
+
+<$if noninheritedFetchedProperties.@count > 0$>
+@interface <$managedObjectClassName$>FetchedProperties: NSObject<$foreach FetchedProperty noninheritedFetchedProperties do$>
++ (NSString *)<$FetchedProperty.name$>;<$endforeach do$>
+@end
+<$endif$>
+
+<$if hasUserInfoKeys$>
+@interface <$managedObjectClassName$>UserInfo: NSObject <$foreach UserInfo userInfoKeyValues do$>
++ (NSString *)<$UserInfo.key$>;<$endforeach do$>
+@end
+<$endif$>
+
 NS_ASSUME_NONNULL_END

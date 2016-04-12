@@ -19,10 +19,9 @@
     }
 
     NSPropertyDescription *propertyDescription = [[self alloc] init];
-	//If a property is marked as non-optional in the MOM, the XML will have no "optional"
-	//attribute at all. NSPropertyDescription's default value is YES, but we want our default
-	//value to be NO.
-	propertyDescription.optional = NO;
+    BOOL optional = NO;
+    BOOL transient = NO;
+    BOOL indexed = NO;
     BOOL syncable = NO;
 
     for (NSXMLNode *xmlAttribute in [xmlNode attributes]) {
@@ -31,11 +30,11 @@
         if ([attributeName isEqualToString:@"name"]) {
             [propertyDescription setName:attributeString];
         } else if ([attributeName isEqualToString:@"optional"]) {
-            [propertyDescription setOptional:[attributeString isEqualToString:@"YES"]];
+            optional = [attributeString isEqualToString:@"YES"];
         } else if ([attributeName isEqualToString:@"transient"]) {
-            [propertyDescription setTransient:[attributeString isEqualToString:@"YES"]];
+            transient = [attributeString isEqualToString:@"YES"];
         } else if ([attributeName isEqualToString:@"indexed"]) {
-            [propertyDescription setIndexed:[attributeString isEqualToString:@"YES"]];
+            indexed = [attributeString isEqualToString:@"YES"];
         } else if ([attributeName isEqualToString:@"syncable"]) {
             syncable = [attributeString isEqualToString:@"YES"];
         } else if ([attributeName isEqualToString:@"versionHashModifier"]) {
@@ -44,6 +43,11 @@
             [propertyDescription setRenamingIdentifier:attributeString];
         }
     }
+    
+    [propertyDescription setOptional:optional];
+    [propertyDescription setTransient:transient];
+    [propertyDescription setIndexed:indexed];
+    
 
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
 
