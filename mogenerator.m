@@ -632,6 +632,8 @@ static const NSString *const kAdditionalHeaderFileNameKey = @"additionalHeaderFi
             return [(NSNumber*)self.defaultValue stringValue] ?: @"0";
         case NSStringAttributeType:
             return [NSString stringWithFormat:@"\"%@\"", self.defaultValue];
+        case NSUndefinedAttributeType:
+            return self.userInfo[@"swiftDefaultValueLiteral"];
         default:
             return nil;
     }
