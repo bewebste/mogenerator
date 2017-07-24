@@ -100,7 +100,11 @@ const NSString *const kUsesScalarAttributeType = @"mogenerator.usesScalarAttribu
 
                 break;
             }
-                
+			case NSStringAttributeType:
+			{
+				[attributeDescription setDefaultValue:defaultValueString];
+				break;
+			}
             default:
                 break;
         }

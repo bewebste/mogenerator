@@ -88,8 +88,27 @@ NS_ASSUME_NONNULL_BEGIN
  */
 <$endif$>
 <$if Relationship.isToMany$>
+<$if TemplateVar.arc$>
+<$if TemplateVar.generics$>
+@property (nonatomic, strong<$if Relationship.optional$>, nullable<$endif$>) <$Relationship.immutableCollectionClassName$><<$Relationship.destinationEntity.managedObjectClassName$> *> *<$Relationship.name$>;
+<$else$>
 @property (nonatomic, strong<$if Relationship.optional$>, nullable<$endif$>) <$Relationship.immutableCollectionClassName$> *<$Relationship.name$>;
+<$endif$>
+<$else$>
+<$if TemplateVar.generics$>
+@property (nonatomic, retain<$if Relationship.optional$>, nullable<$endif$>) <$Relationship.immutableCollectionClassName$><<$Relationship.destinationEntity.managedObjectClassName$> *> *<$Relationship.name$>;
+<$else$>
+@property (nonatomic, retain<$if Relationship.optional$>, nullable<$endif$>) <$Relationship.immutableCollectionClassName$> *<$Relationship.name$>;
+<$endif$>
+<$endif$>
+<$if TemplateVar.generics$>
+- (<$if Relationship.optional$>nullable <$endif$><$Relationship.mutableCollectionClassName$><<$Relationship.destinationEntity.managedObjectClassName$> *> *)<$Relationship.name$>Set;
+<$else$>
 - (<$if Relationship.optional$>nullable <$endif$><$Relationship.mutableCollectionClassName$>*)<$Relationship.name$>Set;
+<$endif$>
+<$else$>
+<$if TemplateVar.arc$>
+@property (nonatomic, strong) <$Relationship.destinationEntity.managedObjectClassName$> *<$Relationship.name$>;
 <$else$>
 @property (nonatomic, strong<$if Relationship.optional$>, nullable<$endif$>) <$Relationship.destinationEntity.managedObjectClassName$> *<$Relationship.name$>;
 <$endif$>
@@ -127,8 +146,13 @@ NS_ASSUME_NONNULL_BEGIN
 <$foreach Relationship noninheritedRelationships do$>
 <$if Relationship.isToMany$>
 @interface _<$managedObjectClassName$> (<$Relationship.name.initialCapitalString$>CoreDataGeneratedAccessors)
+<$if TemplateVar.generics$>
+- (void)add<$Relationship.name.initialCapitalString$>:(<$Relationship.immutableCollectionClassName$><<$Relationship.destinationEntity.managedObjectClassName$> *> *)value_;
+- (void)remove<$Relationship.name.initialCapitalString$>:(<$Relationship.immutableCollectionClassName$><<$Relationship.destinationEntity.managedObjectClassName$> *> *)value_;
+<$else$>
 - (void)add<$Relationship.name.initialCapitalString$>:(<$Relationship.immutableCollectionClassName$>*)value_;
 - (void)remove<$Relationship.name.initialCapitalString$>:(<$Relationship.immutableCollectionClassName$>*)value_;
+<$endif$>
 - (void)add<$Relationship.name.initialCapitalString$>Object:(<$Relationship.destinationEntity.managedObjectClassName$>*)value_;
 - (void)remove<$Relationship.name.initialCapitalString$>Object:(<$Relationship.destinationEntity.managedObjectClassName$>*)value_;
 <$if Relationship.isOrdered$>
@@ -156,8 +180,13 @@ NS_ASSUME_NONNULL_BEGIN
 <$endforeach do$>
 <$foreach Relationship noninheritedRelationships do$>
 <$if Relationship.isToMany$>
+<$if TemplateVar.generics$>
+- (<$Relationship.mutableCollectionClassName$><<$Relationship.destinationEntity.managedObjectClassName$> *> *)primitive<$Relationship.name.initialCapitalString$>;
+- (void)setPrimitive<$Relationship.name.initialCapitalString$>:(<$Relationship.mutableCollectionClassName$><<$Relationship.destinationEntity.managedObjectClassName$> *> *)value;
+<$else$>
 - (<$Relationship.mutableCollectionClassName$>*)primitive<$Relationship.name.initialCapitalString$>;
 - (void)setPrimitive<$Relationship.name.initialCapitalString$>:(<$Relationship.mutableCollectionClassName$>*)value;
+<$endif$>
 <$else$>
 - (<$Relationship.destinationEntity.managedObjectClassName$>*)primitive<$Relationship.name.initialCapitalString$>;
 - (void)setPrimitive<$Relationship.name.initialCapitalString$>:(<$Relationship.destinationEntity.managedObjectClassName$>*)value;
