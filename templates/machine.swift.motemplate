@@ -5,6 +5,12 @@ import Foundation
 import CoreData
 <$if hasCustomBaseCaseImport$>import <$baseClassImport$><$endif$>
 
+<$if hasAdditionalImports$>
+<$foreach Import additionalImports do$>
+import <$Import$>
+<$endforeach do$>
+<$endif$>
+
 <$if noninheritedAttributes.@count > 0$>
 public enum <$sanitizedManagedObjectClassName$>Attributes: String {<$foreach Attribute noninheritedAttributes do$>
     case <$Attribute.name$> = "<$Attribute.name$>"<$endforeach do$>
@@ -47,11 +53,7 @@ open class _<$sanitizedManagedObjectClassName$>: NSManagedObject {
 
     @nonobjc
     open class func fetchRequest() -> NSFetchRequest<<$sanitizedManagedObjectClassName$>> {
-        if #available(iOS 10.0, tvOS 10.0, watchOS 3.0, macOS 10.12, *) {
-            return NSManagedObject.fetchRequest() as! NSFetchRequest<<$sanitizedManagedObjectClassName$>>
-        } else {
-            return NSFetchRequest(entityName: self.entityName())
-        }
+        return NSFetchRequest(entityName: self.entityName())
     }
 
     // MARK: - Life cycle methods

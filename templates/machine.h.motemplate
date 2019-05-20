@@ -17,6 +17,12 @@
 #import "<$additionalHeaderFileName$>"
 <$endif$>
 
+<$if hasAdditionalImports$>
+<$foreach Import additionalImports do$>
+@import <$Import$>;
+<$endforeach do$>
+<$endif$>
+
 NS_ASSUME_NONNULL_BEGIN
 
 <$foreach Relationship noninheritedRelationships do$>@class <$Relationship.destinationEntity.managedObjectClassName$>;
@@ -188,8 +194,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPrimitive<$Relationship.name.initialCapitalString$>:(<$Relationship.mutableCollectionClassName$>*)value;
 <$endif$>
 <$else$>
-- (<$Relationship.destinationEntity.managedObjectClassName$>*)primitive<$Relationship.name.initialCapitalString$>;
-- (void)setPrimitive<$Relationship.name.initialCapitalString$>:(<$Relationship.destinationEntity.managedObjectClassName$>*)value;
+- (<$if Relationship.optional$>nullable <$endif$><$Relationship.destinationEntity.managedObjectClassName$>*)primitive<$Relationship.name.initialCapitalString$>;
+- (void)setPrimitive<$Relationship.name.initialCapitalString$>:(<$if Relationship.optional$>nullable <$endif$><$Relationship.destinationEntity.managedObjectClassName$>*)value;
 <$endif$>
 <$endforeach do$>
 @end

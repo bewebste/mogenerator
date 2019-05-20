@@ -1,5 +1,5 @@
 // mogenerator.h
-//   Copyright (c) 2006-2016 Jonathan 'Wolf' Rentzsch: http://rentzsch.com
+//   Copyright (c) 2006-2019 Jonathan 'Wolf' Rentzsch: http://rentzsch.com
 //   Some rights reserved: http://opensource.org/licenses/mit
 //   http://github.com/rentzsch/mogenerator
 
@@ -17,6 +17,11 @@
 - (NSArray*)entitiesWithACustomSubclassInConfiguration:(NSString*)configuration_ verbose:(BOOL)verbose_;
 @end
 
+@interface NSEntityDescription (userInfo)
+/// @return Whether or not the entity should be ignored during code generation
+- (BOOL)isIgnored;
+@end
+
 @interface NSEntityDescription (customBaseClass)
 - (BOOL)hasCustomClass;
 - (BOOL)hasSuperentity;
@@ -32,12 +37,14 @@
 @interface NSAttributeDescription (typing)
 - (BOOL)hasScalarAttributeType;
 - (BOOL)usesScalarAttributeType;
+- (BOOL)usesCustomScalarAttributeType;
 - (NSString*)scalarAttributeType;
 - (NSString*)scalarAccessorMethodName;
 - (NSString*)scalarFactoryMethodName;
 - (BOOL)hasDefinedAttributeType;
 - (NSArray*)objectAttributeTransformableProtocols;
 - (BOOL)hasAttributeTransformableProtocols;
+- (BOOL)usesCustomObjectAttributeType;
 - (NSString*)objectAttributeClassName;
 - (NSString*)objectAttributeType;
 - (BOOL)hasTransformableAttributeType;
